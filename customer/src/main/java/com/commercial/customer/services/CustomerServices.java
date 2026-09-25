@@ -1,5 +1,8 @@
 package com.commercial.customer.services;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -12,12 +15,12 @@ import com.commercial.customer.pojo.CustomerPojo;
 import com.commercial.customer.repository.CustomerRepository;
 
 @Service
-public class CustomerServices implements CustomerContract{
-	
+public class CustomerServices implements CustomerContract {
+
 	Logger logger = LoggerFactory.getLogger(CustomerServices.class);
-	
+
 	private CustomerRepository customerRepository;
-	
+
 	public CustomerServices(CustomerRepository customerRepository) {
 		this.customerRepository = customerRepository;
 	}
@@ -26,16 +29,22 @@ public class CustomerServices implements CustomerContract{
 		customerRepository.save(customer);
 		return "Customer is saved successfully";
 	}
-	
-	public CustomerPojo getCustomerDetails(String custId) {
-		CustomerPojo customerPojo = null;
-		Customer customer = customerRepository.findByCustomerId(custId);
-		if (customer != null && !ObjectUtils.isEmpty(customer)) {
-			customerPojo = new CustomerPojo();
-			BeanUtils.copyProperties(customer, customerPojo);
-		}
-		logger.info("Copy Customer to Pojo: {}", customerPojo);
-		return customerPojo;
+
+	public CustomerPojo getCustomerDetails(String custId) throws ExecutionException, InterruptedException {
+
+		CompletableFuture<CustomerPojo> completableFuture = CompletableFuture.supplyAsync(() -> {
+
+			CustomerPojo customerPojo = null;
+			Customer customer = customerRepository.findByCustomerId(custId);
+			if (customer != null && !ObjectUtils.isEmpty(customer)) {
+				customerPojo = new CustomerPojo();
+				BeanUtils.copyProperties(customer, customerPojo);
+			}
+			logger.info("Copy Customer to Pojo: {}", customerPojo);
+			return customerPojo;
+
+		});
+		return completableFuture.get();
 	}
 
 }
