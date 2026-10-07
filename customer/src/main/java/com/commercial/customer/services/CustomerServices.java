@@ -19,7 +19,7 @@ public class CustomerServices implements CustomerContract {
 
 	Logger logger = LoggerFactory.getLogger(CustomerServices.class);
 
-	private CustomerRepository customerRepository;
+	private final CustomerRepository customerRepository;
 
 	public CustomerServices(CustomerRepository customerRepository) {
 		this.customerRepository = customerRepository;
@@ -40,6 +40,7 @@ public class CustomerServices implements CustomerContract {
 				customerPojo = new CustomerPojo();
 				BeanUtils.copyProperties(customer, customerPojo);
 			}
+			logger.info("Thread from global: {}",Thread.currentThread().getName());
 			logger.info("Copy Customer to Pojo: {}", customerPojo);
 			return customerPojo;
 

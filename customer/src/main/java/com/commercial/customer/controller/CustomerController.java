@@ -17,7 +17,7 @@ import com.commercial.customer.services.CustomerServices;
 @RequestMapping("/rest/customer")
 public class CustomerController {
 	
-	private CustomerServices customerServices;
+	private final CustomerServices customerServices;
 	
 	public CustomerController(CustomerServices customerServices) {
 		this.customerServices = customerServices;
